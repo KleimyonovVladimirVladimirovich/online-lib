@@ -22,7 +22,7 @@ public class BookEntityConverter {
         return new Book(
                 book.getId(),
                 book.getName(),
-                book.getAuthorName(),
+                book.getAuthorId(),
                 book.getPublicationYear(),
                 book.getPageNumber(),
                 book.getCost()

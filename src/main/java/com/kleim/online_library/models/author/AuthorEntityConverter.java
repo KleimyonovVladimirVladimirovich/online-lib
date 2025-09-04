@@ -12,7 +12,11 @@ import java.util.stream.Collectors;
 public class AuthorEntityConverter {
 
     @Autowired
-    private BookEntityConverter bookEntityConverter;
+    private final BookEntityConverter bookEntityConverter;
+
+    public AuthorEntityConverter(BookEntityConverter bookEntityConverter) {
+        this.bookEntityConverter = bookEntityConverter;
+    }
 
     public Author toAuthorFromEntity(AuthorEntity author) {
         return new Author(

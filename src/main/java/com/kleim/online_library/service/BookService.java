@@ -20,82 +20,68 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final BookEntityConverter bookEntityConverter;
-    private final BookConverter bookConverter;
+    private final AuthorService authorService;
 
-    public BookService(BookRepository bookRepository, BookEntityConverter bookEntityConverter, BookConverter bookConverter) {
+    public BookService(BookRepository bookRepository, BookEntityConverter bookEntityConverter, AuthorService authorService) {
         this.bookRepository = bookRepository;
         this.bookEntityConverter = bookEntityConverter;
-        this.bookConverter = bookConverter;
+        this.authorService = authorService;
     }
 
-    public List<Book> getAllBooks() {
 
-        return null;
-    }
+    public Book createBook(Book bookToCrete) {
+        checkAuthorExistence(bookToCrete.authorId());
 
-    public Book createBook(Book bookToCreate) {
-        var bookToSave = new BookEntity(
-                null,
-                bookToCreate.name(),
-                bookToCreate.authorId(),
-                bookToCreate.publicationYear(),
-                bookToCreate.pageNumber(),
-                bookToCreate.cost()
-        );
-
+        var bookToSave = bookEntityConverter.toBookEntity(bookToCrete);
         var savedEntity = bookRepository.save(bookToSave);
-        return new Book(
-                savedEntity.getId(),
-                savedEntity.getName(),
-                savedEntity.getAuthorName(),
-                savedEntity.getPublicationYear(),
-                savedEntity.getPageNumber(),
-                savedEntity.getCost()
-        );
 
+        return bookEntityConverter.toBookFromEntity(savedEntity);
     }
-
 
     public Book findById(Long id) {
-        var foundBook = bookRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("No such user with id: %s".formatted(id)));
-        return bookEntityConverter.toBookFromEntity(foundBook);
+        var foundBook = bookRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "No found book by id=%s".formatted(id)
+                ));
 
+        return bookEntityConverter.toBookFromEntity(foundBook);
     }
 
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
-            throw new EntityNotFoundException("No found book with id: %s".formatted(id));
+            throw new EntityNotFoundException("No found book by id=%s".formatted(id));
         }
         bookRepository.deleteById(id);
     }
 
     public Book updateBook(
             Long id,
-            Book updateToBook
+            Book bookToUpdate
     ) {
         if (!bookRepository.existsById(id)) {
-            throw new EntityNotFoundException("No such book with id: %s".formatted(id));
+            throw new EntityNotFoundException("No found book by id=%s".formatted(id));
         }
+        checkAuthorExistence(bookToUpdate.id());
+
         bookRepository.updateBook(
                 id,
-                updateToBook.name(),
-                updateToBook.authorId(),
-                updateToBook.publicationYear(),
-                updateToBook.pageNumber(),
-                updateToBook.cost()
-                );
-//        var bookUpdate = new BookEntity(
-//                id,
-//                updateToBook.name(),
-//                updateToBook.authorName(),
-//                updateToBook.publicationYear(),
-//                updateToBook.pageNumber(),
-//                updateToBook.cost()
-//        );
-//        var updatedBook = bookRepository.save(bookUpdate);
-        return bookEntityConverter.toBookFromEntity(
-                bookRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No element with id %s".formatted(id))));
+                bookToUpdate.name(),
+                bookToUpdate.authorId(),
+                bookToUpdate.publicationYear(),
+                bookToUpdate.pageNumber(),
+                bookToUpdate.cost()
+        );
 
+        return bookEntityConverter.toBookFromEntity(
+                bookRepository.findById(id).orElseThrow()
+        );
+    }
+
+    private void checkAuthorExistence(Long authorId) {
+        if (!authorService.isAuthorExistsById(authorId)) {
+            throw new IllegalArgumentException("Author not exists by id=%s"
+                    .formatted(authorId));
+        }
     }
 
     public List<Book> searchAllBooks(BookSearchFilter bookSearchFilter) {
@@ -107,13 +93,6 @@ public class BookService {
                 .stream()
                 .map(bookEntityConverter::toBookFromEntity)
                 .toList();
-
-//        var findAllBooks = bookRepository.findAll()
-//                .stream()
-//                .filter(it -> authorName == null || it.getAuthorName().equals(authorName))
-//                .filter(it -> cost == null || it.getCost() < 5000)
-//                .toList();
-//        return bookEntityConverter.toBookFromEntity(findAllBooks);
 
     }
 }

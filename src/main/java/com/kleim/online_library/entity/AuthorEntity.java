@@ -8,6 +8,12 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
+@NamedEntityGraph(
+        name = "author-with-books",
+        attributeNodes = {
+                @NamedAttributeNode("bookList")
+        }
+)
 @Table(name = "author")
 public class AuthorEntity {
 
@@ -22,6 +28,7 @@ public class AuthorEntity {
     private Integer birthYear;
 
     @OneToMany
+    @JoinColumn(name = "author_id", referencedColumnName = "id")
     private Set<BookEntity> bookList;
 
     public AuthorEntity() {}

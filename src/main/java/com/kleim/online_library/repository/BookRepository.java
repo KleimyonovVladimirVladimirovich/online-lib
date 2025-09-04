@@ -15,7 +15,7 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
 
     @Query(value = """
             SELECT b FROM BookEntity b 
-            WHERE (:authorName IS NULL OR b.authorId = :authorId)
+            WHERE (:authorId IS NULL OR b.authorId = :authorId)
              AND (:cost IS NULL OR b.cost < :cost)""")
     List<BookEntity> findAllBooks(
             Long authorId,
@@ -33,9 +33,9 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
     void updateBook(
             @Param("id") Long id,
             @Param("name") String name,
-            @Param("authorId") Long authorId,
-            @Param("publicationYear") Integer publicationYear,
-            @Param("pageNumber") Integer pageNumber,
+            @Param("author_id") Long authorId,
+            @Param("publication_year") Integer publicationYear,
+            @Param("page_number") Integer pageNumber,
             @Param("cost") Integer cost
     );
 

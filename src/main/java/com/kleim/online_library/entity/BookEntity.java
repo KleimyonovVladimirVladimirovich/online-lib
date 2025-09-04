@@ -14,7 +14,7 @@ public class BookEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "author_name", nullable = false)
+    @Column(name = "author_id")
     private Long authorId;
 
     @Column(name = "publication_year", nullable = false)
@@ -61,11 +61,11 @@ public class BookEntity {
         this.name = name;
     }
 
-    public Long getAuthorName() {
+    public Long getAuthorId() {
         return authorId;
     }
 
-    public void setAuthorName(Long authorId) {
+    public void setAuthorId(Long authorId) {
         this.authorId = authorId;
     }
 

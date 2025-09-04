@@ -9,7 +9,11 @@ import org.springframework.stereotype.Component;
 public class AuthorConverter {
 
     @Autowired
-    private  BookConverter bookConverter;
+    private final BookConverter bookConverter;
+
+    public AuthorConverter(BookConverter bookConverter) {
+        this.bookConverter = bookConverter;
+    }
 
     public Author toAuthor(AuthorDTO author) {
         return new Author(
